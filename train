@@ -1,0 +1,234 @@
+
+{
+  "$schema": "http://-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^(?!_)(?!.*_$)[a-z][a-z0-9_]*$"
+    },
+    "id": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "type": {
+      "$ref": "#/definitions/experimentType"
+    },
+    "revision": {
+      "type": "number"
+    },
+    "variants": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/variant"
+      }
+    },
+    "experiments": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/definitions/experiment"
+      }
+    }
+  },
+  "definitions": {
+    "variant": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "canonicalName": {
+          "type": "string",
+          "pattern": "^(?!_)(?!.*_$)[a-z][a-z0-9_]*$"
+        },
+        "displayName": {
+          "type": "string",
+          "pattern": "^(?!_)(?!.*_$)[a-z][a-z0-9_]*$"
+        },
+        "id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "configuration": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "required": [
+        "canonicalName",
+        "displayName",
+        "description",
+        "configuration"
+      ]
+    },
+    "experiment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^(?!_)(?!.*_$)[a-z][a-z0-9_]*$"
+        },
+        "id": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "exposure": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100,
+          "multipleOf": 0.0001
+        },
+        "state": {
+          "$ref": "#/definitions/state"
+        },
+        "sticky": {
+          "type": "boolean"
+        },
+        "stage": {
+          "$ref": "#/definitions/stage"
+        },
+        "filters": {
+          "$ref": "#/definitions/filter"
+        },
+        "variants": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/definitions/experimentVariant"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "exposure",
+        "state",
+        "sticky",
+        "stage",
+        "variants"
+      ]
+    },
+    "experimentVariant": {
+      "type": "object",
+      "properties": {
+        "canonicalName": {
+          "type": "string",
+          "pattern": "^(?!_)(?!.*_$)[a-z][a-z0-9_]*$"
+        },
+        "state": {
+          "$ref": "#/definitions/state"
+        },
+        "weight": {
+          "type": "number",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "canonicalName",
+        "state",
+        "weight"
+      ]
+    },
+    "experimentType": {
+      "type": "string",
+      "enum": [
+        "AB_TEST",
+        "REMOTE_CONFIG"
+      ]
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "DEV",
+        "PROD"
+      ]
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "OPEN",
+        "FROZEN",
+        "DISABLED"
+      ]
+    },
+    "filter": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "fact": {
+          "type": "string"
+        },
+        "operator": {
+          "type": "string",
+          "enum": [
+            "equal",
+            "notEqual",
+            "lessThan",
+            "lessThanInclusive",
+            "greaterThan",
+            "greaterThanInclusive",
+            "in",
+            "notIn"
+          ]
+        },
+        "value": {
+          "type": [
+            "string",
+            "integer",
+            "boolean",
+            "array"
+          ]
+        },
+        "defaultEvaluation": {
+          "type": "boolean"
+        },
+        "all": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/filter"
+          }
+        },
+        "any": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/filter"
+          }
+        }
+      },
+      "oneOf": [
+        {
+          "required": [
+            "fact",
+            "operator",
+            "value"
+          ]
+        },
+        {
+          "required": [
+            "all"
+          ]
+        },
+        {
+          "required": [
+            "any"
+          ]
+        }
+      ]
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "type",
+    "variants",
+    "experiments"
+  ]
+}
